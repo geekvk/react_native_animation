@@ -1,90 +1,81 @@
-import { StyleSheet, Text, View, ScrollView, Animated } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
-import Header from './Header'
+import { StyleSheet, Text, View, TouchableOpacity, Animated } from 'react-native'
+import React, { useRef, useState } from 'react'
 
 const App = () => {
-  // useRef returns a mutable ref object whose current property is initialized to the passed argument
-  // The returned object will persists for the full life time of the component
-  let animatedHeaderValue = new Animated.Value(0);
-  const Header_Max_Height = 150;
-  const Header_Min_Height = 50;
+  const [show, setShow] = useState(false);
 
-  const animateHeaderBGColor = animatedHeaderValue.interpolate({
-    inputRange: [0, Header_Max_Height-Header_Min_Height],
-    outputRange: ["blue", "red"],
-    extrapolate: 'clamp'
-  });
-  const animatedTextColor = animatedHeaderValue.interpolate({
-    inputRange: [0, Header_Max_Height-Header_Min_Height],
-    outputRange: ["white", "black"],
-    extrapolate: 'clamp'
-  })
-  const animatedHeaderHeight = animatedHeaderValue.interpolate({
-    inputRange: [0, Header_Max_Height - Header_Min_Height],
-    outputRange: [Header_Max_Height, Header_Min_Height],
-    extrapolate: 'clamp'
+  const animatedView = useRef(new Animated.Value(0)).current;
+
+  const showData = () => {
+    setShow(!show);
+    Animated.timing(animatedView, {
+      toValue: show ? 0 : 1,
+      duration: 500,
+      useNativeDriver: false
+    }).start();
+  }
+  const dropdownHeight = animatedView.interpolate({
+    inputRange: [0,1],
+    outputRange: [0, 100]
   })
   return (
     <View style={styles.container}>
-      <Animated.View style={[styles.header, {
-        height: animatedHeaderHeight,
-        backgroundColor: animateHeaderBGColor
-      }]}>
-        <Animated.Text style={[styles.headerText, { color: animatedTextColor }]}>Header container</Animated.Text>
-      </Animated.View>
-      <ScrollView
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{nativeEvent: {contentOffset: {y: animatedHeaderValue}}}],
-          {useNativeDriver: false}
-        )}
+      <AnimatedAccordion
+        show={show}
+        setShow={setShow}
       >
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-        <TestText/>
-      </ScrollView>
+        <View>
+          <Text>Dummy data</Text>
+        </View>
+      </AnimatedAccordion>
     </View>
   )
 }
 
+const AnimatedAccordion = ({ children, setShow, show }) => {
+  // const [show, setShow] = useState(false);
+
+  const animatedView = useRef(new Animated.Value(0)).current;
+
+  const showData = () => {
+    setShow(!show);
+    Animated.timing(animatedView, {
+      toValue: show ? 0 : 1,
+      duration: 500,
+      useNativeDriver: false
+    }).start();
+  }
+  const dropdownHeight = animatedView.interpolate({
+    inputRange: [0,1],
+    outputRange: [0, 100]
+  });
+  return(
+    <>
+      <TouchableOpacity
+        style={{
+          backgroundColor: 'red',
+          padding: 10
+        }}
+        onPress={showData}
+      >
+        <Text>Title</Text>
+      </TouchableOpacity>
+      <Animated.View
+        style={{
+          height: dropdownHeight,
+          overflow: 'hidden',
+        }}>
+        <View style={{ backgroundColor: 'gray', height: 100 }}>
+          {children}
+        </View>
+      </Animated.View>
+    </>
+  )
+}
 export default App
 
-const TestText = () => (
-  <Text style={styles.text}>Text</Text>
-)
 const styles = StyleSheet.create({
   container:{
-    flex: 1,
-  },
-  text:{
-    fontSize: 50,
-    fontWeight: '600'
-  },
-  header:{
-    width: '100%',
-    alignItems: 'center'
-  },
-  headerText:{
-    fontSize: 30,
+    flex: 1
   }
 })
